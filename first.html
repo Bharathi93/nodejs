@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+	<style>
+
+
+  .bar{
+    fill: black;
+  }
+
+  .bar:hover{
+    fill: blue;
+  }
+
+	.axis {
+	  font: 10px sans-serif;
+	}
+
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+    shape-rendering: crispEdges;
+	}
+body
+{
+	background:#e3e3e3 ;
+}
+h1
+{
+  text-align: center;
+}
+	</style>
+</head>
+<body>
+<h1>GDP vs Country</h1>
+<script src="d3.js"></script>
+<script>
+
+// set margin height and width
+var margin = {top: 30, right: 20, bottom: 70, left: 40},
+    width = 1300 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// scale to define the model for axis
+var x = d3.scale.ordinal().rangeBands([5, width],0.2);
+var y = d3.scale.linear().range([height, 0]);
+
+// define the axis
+var xAxis = d3.svg.axis().scale(x).orient("bottom");
+var yAxis = d3.svg.axis().scale(y).orient("left");
+
+
+// append the elements to body
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// Gets the json data
+d3.json("file1.json", function(error, data) {
+
+    data.forEach(function(d) {
+        d.CountryName = d.CountryName;
+				d.GDP2013 = +d.GDP2013;
+    });
+
+  // stores the domain for the axis
+  //  map returns an array of values
+  x.domain(data.map(function(d) { return d.CountryName; }));
+  y.domain([0, d3.max(data, function(d) { return d.GDP2013; })]);
+
+  // Axis display specification
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "middle")
+     .attr("dx", "-.08em")
+
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".81em")
+      .style("text-anchor", "middle")
+      .text("GDP");
+
+
+// Binds the data to the barchart
+//Enter gives a new structure to every bar
+  svg.selectAll("bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.CountryName); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.GDP2013); })
+      .attr("height", function(d) { return height - y(d.GDP2013); });
+
+});
+
+</script>
+
+</body>
+</html>
