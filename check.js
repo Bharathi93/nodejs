@@ -1,5 +1,5 @@
-var fs = require('fs');
 
+var fs = require('fs');
 
 var array1=[];
 var text=[];
